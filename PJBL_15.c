@@ -50,19 +50,40 @@ Modo normal: Cria o tabuleiro normal, sem espaço adicional;
 
 
 //funcao criar tabuleiro com alocacao dinamica
-int criar_Tabuleiro(modo_jogo)
+int** criar_Tabuleiro(modo_jogo) //mexer na parte de criar um espaço adicional ainda -> Perguntar para o professor 
 {
     int **tabuleiro;
-    int i, j;
+    int i, j, temp, numero_aleatorio, contador = 0;
+    int vetor_randomico[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}; //criar um vetor e embaralhar ele
+
+    srand(time(NULL)); //inicializa o gerador numeros aleatorios
+
+    for(j = 15; j > 0; j--)
+    {
+        numero_aleatorio = rand() % (j + 1); //randomiza um numero de j ate 0
+
+        temp = vetor_randomico[j]; //pega o valor do vetor na posicao j e guarda
+        vetor_randomico[j] = vetor_randomico[numero_aleatorio]; //o valor atual do vetor vai para a posicao do numero aleatorio
+        vetor_randomico[numero_aleatorio] = temp; //o valor de temp vai pra posicao do numero aleatorio
+    }
 
     if(modo_jogo == 1)
     {
         //modo facil
-        tabuleiro = (int**)malloc(3 * sizeof(int*)); //cria os espacos de memoria para as linhas -> so pra nao se perder
-        for(i = 0; i < 3; i++)
+        tabuleiro = (int**)malloc(4 * sizeof(int*)); //cria os espacos de memoria para as linhas -> so pra nao se perder
+        for(i = 0; i < 4; i++)
         {
-            tabuleiro[i] = (int*)malloc(3 * sizeof(int)); //cria efetivamente os espacos das onde ficam os inteiros -> so pra nao se perder
+            tabuleiro[i] = (int*)malloc(4 * sizeof(int)); //cria efetivamente os espacos das onde ficam os inteiros -> so pra nao se perder
         }
+        for(i = 0; i < 4; i++)
+        {
+            for(j = 0; j < 4; j++)
+            {
+                tabuleiro[i][j] = vetor_randomico[contador]; //preenche o tabuleiro com os numeros do vetor randomico
+                contador++;
+            }
+        }
+        //IMPORTANTE: ADICIONAR O IF PARA COLOCAR 0 NO LUGAR VAZIO
     }
     else if(modo_jogo == 2)
     {
