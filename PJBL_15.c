@@ -53,7 +53,7 @@ Modo normal: Cria o tabuleiro normal, sem espaço adicional;
 int** criar_Tabuleiro(modo_jogo) //mexer na parte de criar um espaço adicional ainda -> Perguntar para o professor 
 {
     int **tabuleiro;
-    int i, j, temp, numero_aleatorio, contador = 0;
+    int i, j, k, temp, numero_aleatorio, contador = 0;
     int vetor_randomico[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}; //criar um vetor e embaralhar ele
 
     srand(time(NULL)); //inicializa o gerador numeros aleatorios
@@ -73,6 +73,23 @@ int** criar_Tabuleiro(modo_jogo) //mexer na parte de criar um espaço adicional 
         tabuleiro = (int**)malloc(4 * sizeof(int*)); //cria os espacos de memoria para as linhas -> so pra nao se perder
         for(i = 0; i < 4; i++)
         {
+            tabuleiro[i] = (int*)malloc(5 * sizeof(int)); //cria efetivamente os espacos das onde ficam os inteiros -> so pra nao se perder
+            for(k = 0; k < 4; k++)
+            {
+                printf("Tabuleiro[%d][%d] = %d\n", i, k, tabuleiro[i][k]);
+                contador++;
+            }
+            
+        }
+
+        
+    }
+    else if(modo_jogo == 2)
+    {
+        //modo normal
+        tabuleiro = (int**)malloc(4 * sizeof(int*)); //cria os espacos de memoria para as linhas -> so pra nao se perder
+        for(i = 0; i < 4; i++)
+        {
             tabuleiro[i] = (int*)malloc(4 * sizeof(int)); //cria efetivamente os espacos das onde ficam os inteiros -> so pra nao se perder
         }
         for(i = 0; i < 4; i++)
@@ -82,16 +99,6 @@ int** criar_Tabuleiro(modo_jogo) //mexer na parte de criar um espaço adicional 
                 tabuleiro[i][j] = vetor_randomico[contador]; //preenche o tabuleiro com os numeros do vetor randomico
                 contador++;
             }
-        }
-        //IMPORTANTE: ADICIONAR O IF PARA COLOCAR 0 NO LUGAR VAZIO
-    }
-    else if(modo_jogo == 2)
-    {
-        //modo normal
-        tabuleiro = (int**)malloc(4 * sizeof(int*)); //cria os espacos de memoria para as linhas -> so pra nao se perder
-        for(i = 0; i < 4; i++)
-        {
-            tabuleiro[i] = (int*)malloc(4 * sizeof(int)); //cria efetivamente os espacos das onde ficam os inteiros -> so pra nao se perder
         }
     }
 
