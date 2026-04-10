@@ -50,10 +50,10 @@ Modo normal: Cria o tabuleiro normal, sem espaço adicional;
 
 
 //funcao criar tabuleiro com alocacao dinamica
-int** criar_Tabuleiro(modo_jogo) //mexer na parte de criar um espaço adicional ainda -> Perguntar para o professor 
+int** criar_Tabuleiro(int modo_jogo) //mexer na parte de criar um espaço adicional ainda -> Perguntar para o professor 
 {
     int **tabuleiro;
-    int i, j, k, temp, numero_aleatorio, contador = 0;
+    int i, j, temp, numero_aleatorio, contador = 0;
     int vetor_randomico[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}; //criar um vetor e embaralhar ele
 
     srand(time(NULL)); //inicializa o gerador numeros aleatorios
@@ -70,19 +70,26 @@ int** criar_Tabuleiro(modo_jogo) //mexer na parte de criar um espaço adicional 
     if(modo_jogo == 1)
     {
         //modo facil
-        tabuleiro = (int**)malloc(4 * sizeof(int*)); //cria os espacos de memoria para as linhas -> so pra nao se perder
+        tabuleiro = (int**)malloc(5 * sizeof(int*)); //cria os espacos de memoria para as linhas -> so pra nao se perder
+        for(i = 0; i < 5; i++)
+        {
+            tabuleiro[i] = (int*)malloc(4 * sizeof(int)); //cria efetivamente os espacos das onde ficam os inteiros -> so pra nao se perder
+        }
         for(i = 0; i < 4; i++)
         {
-            tabuleiro[i] = (int*)malloc(5 * sizeof(int)); //cria efetivamente os espacos das onde ficam os inteiros -> so pra nao se perder
-            for(k = 0; k < 4; k++)
+            for(j = 0; j < 4; j++)
             {
-                printf("Tabuleiro[%d][%d] = %d\n", i, k, tabuleiro[i][k]);
+                tabuleiro[i][j] = vetor_randomico[contador]; //preenche o tabuleiro com os numeros do vetor randomico
                 contador++;
             }
-            
         }
 
-        
+        tabuleiro[4][0] = 0; //espaço vazio adicional fora do tabuleiro
+
+        //preenche o resto dos espacos vazios com -1 (Nao tem como criar matrizes que nao sao quadradas usando o malloc)
+        tabuleiro[4][1] = -1;
+        tabuleiro[4][2] = -1;
+        tabuleiro[4][3] = -1;
     }
     else if(modo_jogo == 2)
     {
@@ -105,16 +112,56 @@ int** criar_Tabuleiro(modo_jogo) //mexer na parte de criar um espaço adicional 
     return tabuleiro;
 }
 
-//verifica através de recursividade se o jogo é solucionável
+//verifica atraves de recursividade se o jogo e solucionavel
 int verificar_Resolucao()
 {
 
+}
+
+//funcao para imprimir o tabuleiro
+void imprimir_Tabuleiro(int **tabuleiro, int modo_jogo)
+{
+    int i, j, total_linhas;
+
+    if (modo_jogo == 1)
+    {
+        total_linhas = 5;
+    } 
+    else
+    {
+        total_linhas = 4;
+    }
+
+    printf("\n=== JOGO DOS QUINZE by Gabriel Oliveira e Luiza Beber ===\n\n"); 
+
+    for(i = 0; i < total_linhas; i++)
+    {
+        for(j = 0; j < 4; j++)
+        {
+            if(tabuleiro[i][j] == -1)
+            {
+                printf("    "); //espaço vazio pra tirar os -1
+            }
+            else if(tabuleiro[i][j] == 0)
+            {
+                printf("[  ]"); 
+            }
+            else
+            {
+                printf("[%2d]", tabuleiro[i][j]); //imprime os numeros do tabuleiro
+            }
+        }
+
+        printf("\n");
+    }
+    printf("\n");
 }
 
 int main()
 {
 
     int modo; 
+    int **tabuleiro_jogo;
 
     printf("Bem-vindo ao Jogo dos Quinze!\n");
     printf("Selecione o modo de jogo:\n");
@@ -125,12 +172,10 @@ int main()
     if(modo == 1)
     {
         printf("Modo Facil selecionado!\n");
-        criar_Tabuleiro(modo);
     }
     else if(modo == 2)
     {
         printf("Modo Normal selecionado!\n");
-        criar_Tabuleiro(modo);
     }
     else
     {
@@ -140,4 +185,7 @@ int main()
             scanf("%d", &modo);
         }
     }
+
+    tabuleiro_jogo = criar_Tabuleiro(modo);
+    imprimir_Tabuleiro(tabuleiro_jogo, modo);
 }
