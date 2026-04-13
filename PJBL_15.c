@@ -47,7 +47,66 @@ Modo normal: Cria o tabuleiro normal, sem espaço adicional;
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
+int verificar_Inversoes(int *vetor, int indice)
+
+{
+    //caso base:
+    if(indice >= 15)
+    {
+        return 0;
+    } 
+
+    int i, inversoes = 0;
+
+    if(vetor[indice] != 0)
+    {
+        for(i = indice + 1; i < 16; i++)
+        {
+            if(vetor[i] != 0 && vetor[indice] > vetor[i])
+            {
+                inversoes++;
+            }
+        }
+    }
+
+    return inversoes + verificar_Inversoes(vetor, indice + 1);
+}
+
+//verifica atraves de recursividade se o jogo e solucionavel
+int verificar_Resolucao(int *vetor_randomico)
+{
+    /*matematica por tras: -> como tem que funcionar a nossa recursividade
+    Para verificar se o tabuleiro pode ser solucionado temos que contar o numero de inversoes que devem ser feitas 
+    A inversao so acontece quando um numero maior aparece antes de um numero menor. Alem disso, precisamos saber a 
+    posicao do espaco vazio contando de baixo para cima. Caso o esapaco vazio esteja em uma linha par, o numero de 
+    inversoes deve ser impar para o jogo ser solucionavel. Caso o espaco vazio esteja em uma linha impar, o numero
+    de inversoes deve ser par. Caso o numero de inversoes seja impar e o espaco vazio esteja em uma linha impar tambem,
+    o jogo nao e solucionavel. 
+    */
+
+    int i, pos_vazio = 0, linha_vazio, total_inversoes;
+
+    for(i = 0; i < 16; i++)
+    {
+        if(vetor_randomico[i] == 0)
+        {
+            pos_vazio = i;
+            break;
+        }
+    }
+
+    linha_vazio = 4 - (pos_vazio / 4); 
+    total_inversoes = verificar_Inversoes(vetor_randomico, 0);
+    if(linha_vazio % 2 == 0)
+    {
+        return (total_inversoes % 2 != 0); 
+    } else {
+        return (total_inversoes % 2 == 0);
+    }
+
+}
 
 //funcao criar tabuleiro com alocacao dinamica
 int** criar_Tabuleiro(int modo_jogo) //mexer na parte de criar um espaço adicional ainda -> Perguntar para o professor 
@@ -55,9 +114,12 @@ int** criar_Tabuleiro(int modo_jogo) //mexer na parte de criar um espaço adicio
     int **tabuleiro;
     int i, j, temp, numero_aleatorio, contador = 0;
     int vetor_randomico[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}; //criar um vetor e embaralhar ele
+    int solucionavel = 0; //variavel de controle para verificar se e possivel resolver o tabuleiro 
 
     srand(time(NULL)); //inicializa o gerador numeros aleatorios
-
+    
+    
+    do {
     for(j = 15; j > 0; j--)
     {
         numero_aleatorio = rand() % (j + 1); //randomiza um numero de j ate 0
@@ -66,6 +128,8 @@ int** criar_Tabuleiro(int modo_jogo) //mexer na parte de criar um espaço adicio
         vetor_randomico[j] = vetor_randomico[numero_aleatorio]; //o valor atual do vetor vai para a posicao do numero aleatorio
         vetor_randomico[numero_aleatorio] = temp; //o valor de temp vai pra posicao do numero aleatorio
     }
+    solucionavel = verificar_Resolucao(vetor_randomico); //verifica se o vetor randomico e solucionavel
+    } while(!solucionavel); //repete ate que o vetor seja solucionavel
 
     if(modo_jogo == 1)
     {
@@ -112,11 +176,18 @@ int** criar_Tabuleiro(int modo_jogo) //mexer na parte de criar um espaço adicio
     return tabuleiro;
 }
 
-//verifica atraves de recursividade se o jogo e solucionavel
-int verificar_Resolucao()
+int verificar_Vitoria()
 {
 
 }
+
+int verificar_Movimento()
+{
+
+}
+
+//conta o numero de inversoes do tabuleiro
+
 
 //funcao para imprimir o tabuleiro
 void imprimir_Tabuleiro(int **tabuleiro, int modo_jogo)
@@ -169,6 +240,12 @@ int main()
     printf("2. Modo Normal\n");
     scanf("%d", &modo);
 
+    while(modo != 1 && modo != 2)
+        {
+            printf("Opcao invalida. Por favor, selecione uma opcao valida (1 ou 2): ");
+            scanf("%d", &modo);
+        }
+
     if(modo == 1)
     {
         printf("Modo Facil selecionado!\n");
@@ -176,14 +253,6 @@ int main()
     else if(modo == 2)
     {
         printf("Modo Normal selecionado!\n");
-    }
-    else
-    {
-        while(modo != 1 && modo != 2)
-        {
-            printf("Opcao invalida. Por favor, selecione uma opcao valida (1 ou 2): ");
-            scanf("%d", &modo);
-        }
     }
 
     tabuleiro_jogo = criar_Tabuleiro(modo);
