@@ -49,6 +49,7 @@ Modo normal: Cria o tabuleiro normal, sem espaço adicional;
 #include <stdlib.h>
 #include <time.h>
 
+//verifica atraves de recursividade o numero de inversoes
 int verificar_Inversoes(int *vetor, int indice)
 
 {
@@ -74,7 +75,7 @@ int verificar_Inversoes(int *vetor, int indice)
     return inversoes + verificar_Inversoes(vetor, indice + 1);
 }
 
-//verifica atraves de recursividade se o jogo e solucionavel
+//verifica se o tabuleiro e solucionavel
 int verificar_Resolucao(int *vetor_randomico)
 {
     /*matematica por tras: -> como tem que funcionar a nossa recursividade
