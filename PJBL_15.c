@@ -1,50 +1,3 @@
-/*
-Objetivo
-O presente trabalho tem como objetivo a utilização dos conceitos abordados na disciplina no decorrer do semestre, assim como conteúdos anteriormente vistos, visando a construção 
-de uma aplicação parcial em Linguagem C com o intuito de criar uma aplicação de jogo que possibilite ao utilizador as funcionalidades descritas nos itens a seguir;
-O tema/abrangência é de escolha da equipe, dentro das opções propostas, desde que contemple no mínimo os itens solicitados;
-Conceitos Presentes:
-Ponteiros;
-Alocação dinâmica de memória;
-Manipulação de dados em memória;
-Recursividade;
-Conceitos Anteriores:
-Matrizes (arrays bidimensionais);
-Estruturas de controle (condições e repetições);
-Lógica de programação;
-Regras de Desenvolvimento
-A aplicação deve contar com os seguintes requisitos não funcionais:
-A implementação de todo o projeto deve ser feita em linguagem C;
-O aplicativo deverá conter seu menu principal para a seleção das funcionalidades;
-Cada menu deve ser impresso a partir de uma subrotina independente;
-Toda a comunicação entre as subrotinas e o programa principal deverá ser via parâmetro (por valor ou referência). Somente as estruturas (struct), os protótipos das subrotinas podem ser declaradas fora da função main ou de outra subrotina. Naturalmente as bibliotecas e constantes (com #define) sempre são declaradas no início do programa antes da função main;
-Todas as estruturas devem ser coesamente alocadas, seja estática ou dinamicamente, assim como qualquer vetor ou matriz de tipagem normal;
-Jogo dos Quinze
-Descrição
-O Jogo dos Quinze é um quebra-cabeça composto por um tabuleiro 4x4, contendo números de 1 a 15 e um espaço vazio;
-Regras do Jogo
-O jogador escolhe um número para mover;
-A movimentação só é válida se o número estiver adjacente ao espaço vazio;
-O número escolhido troca de posição com o espaço vazio;
-O objetivo é organizar os números na ordem correta:
-1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 [ ]
-O jogo termina quando a sequência estiver correta;
-Desafios Principais
-Validar movimentos permitidos;
-Implementar troca de posições corretamente;
-Verificar condição de vitória;
-Criar embaralhamento válido;
-Verificação se o jogo é solucionável;
-Questões de Implementação
-Criar um tabuleiro 4x4 e preencher com números de 1 a 15 e um espaço vazio;
-Embaralhar o tabuleiro inicial;
-Permitir movimentação das peças (cima (W), baixo (S), esquerda (A), direita (D) ou informando linha e coluna);
-Permitir troca com o espaço vazio;
-Verificar condição de vitória (ordem correta);
-Modo fácil: Criar um espaço vazio adicional fora do tabuleiro para movimentação de apoio;
-Modo normal: Cria o tabuleiro normal, sem espaço adicional;
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -177,18 +130,177 @@ int** criar_Tabuleiro(int modo_jogo) //mexer na parte de criar um espaço adicio
     return tabuleiro;
 }
 
-int verificar_Vitoria()
+//verifica se o tabuleiro esta em ordem (resolvido)
+int verificar_Vitoria(int **tabuleiro)
 {
 
+    int contador = 1;
+    int i, j;
+
+    for(i = 0; i < 4; i++) //apenas a matriz principal 4x4
+    {
+        for(j = 0; j < 4; j++)
+        {
+            if(i == 3 && j == 3) //testar a ultima casa pra ver se eh 0 mesmo
+            {
+                if(tabuleiro[i][j] != 0)
+                {
+                    return 0;
+                }
+            } else 
+            {
+                if(tabuleiro[i][j] != contador)
+                {
+                    return 0;
+                }
+                contador++;
+            }
+        }
+    }
+    return 1;
 }
 
-int verificar_Movimento()
+//funcao que permite a movimentacao das casas dentro do tabuleiro
+void verificar_Movimento(int **tabuleiro, int modo_jogo)
 {
 
+    //linha_zero e coluna_zero sao variaveis pra achar a posicao vazia dentro da matriz
+    int coluna_zero;
+    int linha_zero;
+    int qntd_linhas;
+    int i, j;
+    int jogada_valida = 0; //variavel de controle pra garantir que o usuario digite w, a, s, d ou c
+    char movimento;
+    int linha_movimento = 0;
+    int coluna_movimento = 0;
+
+    if(modo_jogo == 1)
+    {
+        qntd_linhas = 5;
+    } else 
+    {
+        qntd_linhas = 4;
+    }
+
+    //loop pra achar o zero (espaco vazio) dentro do tabuleiro
+    for(i = 0; i < 4; i++)
+    {
+        for(j = 0; j < 4; j++)
+        {
+            if(tabuleiro[i][j] == 0)
+            {
+                linha_zero = i;
+                coluna_zero = j;
+            }
+        }
+    }
+
+    printf("OPCOES DE MOVIMENTACAO: ");
+    printf("\n[W] -> Movimenta a casa para cima.");
+    printf("\n[S] -> Movimenta a casa para baixo.");
+    printf("\n[A] -> Movimenta a casa para esquerda.");
+    printf("\n[D] -> Movimenta a casa para direita.");
+    printf("\n[C] -> Para informar a linha e a coluna.");
+    printf("\nPara inserir numeros no espaco livre extra no modo facil, utilize o comando [C]");
+
+
+    while(jogada_valida == 0)
+    {
+        printf("\nInsira o movimento: ");
+        scanf(" %c", &movimento);
+
+        switch(movimento)
+        {
+            case'w':
+            case'W': 
+                if(linha_zero < 3) //o zero so nao pode descer caso esteja na ultima linha do tab
+                {
+                    tabuleiro[linha_zero][coluna_zero] = tabuleiro[linha_zero + 1][coluna_zero];
+                    tabuleiro[linha_zero + 1][coluna_zero] = 0;
+                    jogada_valida = 1;
+                } else {
+                    printf("Nao eh possivel movimentar a peca atual para cima");
+                }
+                break;
+
+            case 's':
+            case 'S':
+                if(linha_zero > 0) //o zero so nao pode subir caso esteja na primeira linha do tab
+                {
+                    tabuleiro[linha_zero][coluna_zero] = tabuleiro[linha_zero - 1][coluna_zero];
+                    tabuleiro[linha_zero - 1][coluna_zero] = 0;
+                    jogada_valida = 1;
+                } else {
+                    printf("Nao eh possivel movimentar a peca atual para baixo");
+                }
+                break;
+            
+            case 'a':
+            case 'A':
+                if(coluna_zero < 3)
+                {
+                    tabuleiro[linha_zero][coluna_zero] = tabuleiro[linha_zero][coluna_zero + 1];
+                    tabuleiro[linha_zero][coluna_zero + 1] = 0;
+                    jogada_valida = 1;
+                } else {
+                    printf("Nao eh possivel movimentar a peca atual para esquerda");
+                }
+                break;
+
+            case 'd':
+            case 'D':
+                if(coluna_zero > 0)
+                {
+                    tabuleiro[linha_zero][coluna_zero] = tabuleiro[linha_zero][coluna_zero - 1];
+                    tabuleiro[linha_zero][coluna_zero - 1] = 0;
+                    jogada_valida = 1;
+                } else {
+                    printf("Nao eh possivel movimentar a peca atual para direita");
+                }
+                break;
+            
+            case 'c':
+            case 'C': 
+                printf("Digite a linha do numero a mover (1 A %d): ", qntd_linhas);
+                scanf("%d", &linha_movimento);
+                printf("Digite a coluna do numero a mover (1 a 4): ");
+                scanf("%d", &coluna_movimento);
+
+                linha_movimento--;
+                coluna_movimento--;
+
+                if(linha_movimento < 0 || coluna_movimento < 0 || linha_movimento >= qntd_linhas || coluna_movimento > 3)
+                {
+                    printf("\nCoordenada Invalida!");
+                } else if (linha_movimento > 0 && tabuleiro[linha_movimento - 1][coluna_movimento] == 0)
+                {
+                    tabuleiro[linha_movimento - 1][coluna_movimento] = tabuleiro[linha_movimento][coluna_movimento];
+                    tabuleiro[linha_movimento][coluna_movimento] = 0;
+                    jogada_valida = 1;
+                } else if(linha_movimento < qntd_linhas - 1 && tabuleiro[linha_movimento + 1][coluna_movimento] == 0) {
+                    tabuleiro[linha_movimento + 1][coluna_movimento] = tabuleiro[linha_movimento][coluna_movimento];
+                    tabuleiro[linha_movimento][coluna_movimento] = 0;
+                    jogada_valida = 1;
+                } else if(coluna_movimento > 0 && tabuleiro[linha_movimento][coluna_movimento - 1] == 0){
+                    tabuleiro[linha_movimento][coluna_movimento - 1] = tabuleiro[linha_movimento][coluna_movimento];
+                    tabuleiro[linha_movimento][coluna_movimento] = 0;
+                    jogada_valida = 1;
+                } else if(coluna_movimento < 3 && tabuleiro[linha_movimento][coluna_movimento + 1] == 0)
+                {
+                    tabuleiro[linha_movimento][coluna_movimento + 1] = tabuleiro[linha_movimento][coluna_movimento];
+                    tabuleiro[linha_movimento][coluna_movimento] = 0;
+                    jogada_valida = 1;
+                } else {
+                    printf("\nNao eh possivel movimentar a peca para esta localizacao.");
+                }
+                break;
+            
+            default:
+                printf("Opcao Invalida! Insira [W], [A], [S], [D] ou [C]");
+        }
+    }
+
 }
-
-//conta o numero de inversoes do tabuleiro
-
 
 //funcao para imprimir o tabuleiro
 void imprimir_Tabuleiro(int **tabuleiro, int modo_jogo)
@@ -234,6 +346,7 @@ int main()
 
     int modo; 
     int **tabuleiro_jogo;
+    int venceu = 0;
 
     printf("Bem-vindo ao Jogo dos Quinze!\n");
     printf("Selecione o modo de jogo:\n");
@@ -257,5 +370,16 @@ int main()
     }
 
     tabuleiro_jogo = criar_Tabuleiro(modo);
+
+    while(venceu == 0)
+    {
+        system("cls"); //comando pra limpar o terminal
+        imprimir_Tabuleiro(tabuleiro_jogo, modo);
+        verificar_Movimento(tabuleiro_jogo, modo);
+        venceu = verificar_Vitoria(tabuleiro_jogo);
+    }
+
+    system("cls");
     imprimir_Tabuleiro(tabuleiro_jogo, modo);
+    printf("\n ---- PARABENS! VOCE RESOLVEU O TABULEIRO! ---- \n");
 }
