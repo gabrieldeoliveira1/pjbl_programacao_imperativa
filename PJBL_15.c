@@ -355,6 +355,7 @@ void imprimir_Tabuleiro(int **tabuleiro, int modo_jogo)
     printf("\n");
 }
 
+//funcao para exibir o menu do jogo
 int exibir_Menu()
 {
     int opcao;
