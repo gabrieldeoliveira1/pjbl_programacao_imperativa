@@ -161,7 +161,7 @@ int verificar_Vitoria(int **tabuleiro)
 }
 
 //funcao que permite a movimentacao das casas dentro do tabuleiro
-void verificar_Movimento(int **tabuleiro, int modo_jogo)
+void verificar_Movimento(int **tabuleiro, int modo_jogo, int *pontuacao_movimentos, int *desistiu)
 {
 
     //linha_zero e coluna_zero sao variaveis pra achar a posicao vazia dentro da matriz
@@ -201,7 +201,9 @@ void verificar_Movimento(int **tabuleiro, int modo_jogo)
     printf("\n[A] -> Movimenta a casa para esquerda.");
     printf("\n[D] -> Movimenta a casa para direita.");
     printf("\n[C] -> Para informar a linha e a coluna.");
+    printf("\n[E] -> Desistir do jogo");
     printf("\nPara inserir numeros no espaco livre extra no modo facil, utilize o comando [C]");
+
 
 
     while(jogada_valida == 0)
@@ -211,6 +213,12 @@ void verificar_Movimento(int **tabuleiro, int modo_jogo)
 
         switch(movimento)
         {
+            case 'e':
+            case 'E':
+                *desistiu = 1;
+                jogada_valida = 1;
+                break;
+
             case'w':
             case'W': 
                 if(linha_zero < 3) //o zero so nao pode descer caso esteja na ultima linha do tab
@@ -218,6 +226,7 @@ void verificar_Movimento(int **tabuleiro, int modo_jogo)
                     tabuleiro[linha_zero][coluna_zero] = tabuleiro[linha_zero + 1][coluna_zero];
                     tabuleiro[linha_zero + 1][coluna_zero] = 0;
                     jogada_valida = 1;
+                    (*pontuacao_movimentos)++;
                 } else {
                     printf("Nao eh possivel movimentar a peca atual para cima");
                 }
@@ -230,6 +239,7 @@ void verificar_Movimento(int **tabuleiro, int modo_jogo)
                     tabuleiro[linha_zero][coluna_zero] = tabuleiro[linha_zero - 1][coluna_zero];
                     tabuleiro[linha_zero - 1][coluna_zero] = 0;
                     jogada_valida = 1;
+                    (*pontuacao_movimentos)++;
                 } else {
                     printf("Nao eh possivel movimentar a peca atual para baixo");
                 }
@@ -242,6 +252,7 @@ void verificar_Movimento(int **tabuleiro, int modo_jogo)
                     tabuleiro[linha_zero][coluna_zero] = tabuleiro[linha_zero][coluna_zero + 1];
                     tabuleiro[linha_zero][coluna_zero + 1] = 0;
                     jogada_valida = 1;
+                    (*pontuacao_movimentos)++;
                 } else {
                     printf("Nao eh possivel movimentar a peca atual para esquerda");
                 }
@@ -254,6 +265,7 @@ void verificar_Movimento(int **tabuleiro, int modo_jogo)
                     tabuleiro[linha_zero][coluna_zero] = tabuleiro[linha_zero][coluna_zero - 1];
                     tabuleiro[linha_zero][coluna_zero - 1] = 0;
                     jogada_valida = 1;
+                    (*pontuacao_movimentos)++;
                 } else {
                     printf("Nao eh possivel movimentar a peca atual para direita");
                 }
@@ -277,19 +289,23 @@ void verificar_Movimento(int **tabuleiro, int modo_jogo)
                     tabuleiro[linha_movimento - 1][coluna_movimento] = tabuleiro[linha_movimento][coluna_movimento];
                     tabuleiro[linha_movimento][coluna_movimento] = 0;
                     jogada_valida = 1;
+                    (*pontuacao_movimentos)++;
                 } else if(linha_movimento < qntd_linhas - 1 && tabuleiro[linha_movimento + 1][coluna_movimento] == 0) {
                     tabuleiro[linha_movimento + 1][coluna_movimento] = tabuleiro[linha_movimento][coluna_movimento];
                     tabuleiro[linha_movimento][coluna_movimento] = 0;
                     jogada_valida = 1;
+                    (*pontuacao_movimentos)++;
                 } else if(coluna_movimento > 0 && tabuleiro[linha_movimento][coluna_movimento - 1] == 0){
                     tabuleiro[linha_movimento][coluna_movimento - 1] = tabuleiro[linha_movimento][coluna_movimento];
                     tabuleiro[linha_movimento][coluna_movimento] = 0;
                     jogada_valida = 1;
+                    (*pontuacao_movimentos)++;
                 } else if(coluna_movimento < 3 && tabuleiro[linha_movimento][coluna_movimento + 1] == 0)
                 {
                     tabuleiro[linha_movimento][coluna_movimento + 1] = tabuleiro[linha_movimento][coluna_movimento];
                     tabuleiro[linha_movimento][coluna_movimento] = 0;
                     jogada_valida = 1;
+                    (*pontuacao_movimentos)++;
                 } else {
                     printf("\nNao eh possivel movimentar a peca para esta localizacao.");
                 }
@@ -315,9 +331,7 @@ void imprimir_Tabuleiro(int **tabuleiro, int modo_jogo)
     {
         total_linhas = 4;
     }
-
-    printf("\n=== JOGO DOS QUINZE by Gabriel Oliveira e Luiza Beber ===\n\n"); 
-
+    
     for(i = 0; i < total_linhas; i++)
     {
         for(j = 0; j < 4; j++)
@@ -341,45 +355,89 @@ void imprimir_Tabuleiro(int **tabuleiro, int modo_jogo)
     printf("\n");
 }
 
+int exibir_Menu()
+{
+    int opcao;
+    
+    printf("\n--------------------------------------------\n");
+    printf("   JOGO DOS QUINZE - by Gabriel e Luiza");
+    printf("\n--------------------------------------------\n");
+    printf("[1] Iniciar Partida - Modo Facil (Com 1 espaco extra)\n");
+    printf("[2] Iniciar Partida - Modo Normal (Classico 4x4)\n");
+    printf("[3] Sair do Jogo\n");
+    printf("-----------------------------------------------\n");
+    printf("Escolha uma opcao: ");
+    
+    scanf("%d", &opcao);
+    
+   
+    while (opcao != 1 && opcao != 2 && opcao != 3) {
+        printf("[!] Opcao invalida. Tente novamente: ");
+        scanf("%d", &opcao);
+    }
+    
+    return opcao;
+}
+
 int main()
 {
 
-    int modo; 
+    int opcao_menu = 0; 
     int **tabuleiro_jogo;
-    int venceu = 0;
+    int venceu;
+    int placar_movimentos;
+    int i, total_linhas;
+    
 
-    printf("Bem-vindo ao Jogo dos Quinze!\n");
-    printf("Selecione o modo de jogo:\n");
-    printf("1. Modo Facil\n");
-    printf("2. Modo Normal\n");
-    scanf("%d", &modo);
+    while (opcao_menu != 3) {
+        system("cls");
+        
+        opcao_menu = exibir_Menu();
 
-    while(modo != 1 && modo != 2)
+        if (opcao_menu == 1 || opcao_menu == 2) {
+            venceu = 0;
+            placar_movimentos = 0; 
+            int desistiu = 0;
+            tabuleiro_jogo = criar_Tabuleiro(opcao_menu);
+    
+        while(venceu == 0 && desistiu == 0)
         {
-            printf("Opcao invalida. Por favor, selecione uma opcao valida (1 ou 2): ");
-            scanf("%d", &modo);
+            system("cls"); //comando pra limpar o terminal
+            printf("\n--- PLACAR: %d Movimentos ---\n", placar_movimentos);
+            imprimir_Tabuleiro(tabuleiro_jogo, opcao_menu);
+            verificar_Movimento(tabuleiro_jogo, opcao_menu, &placar_movimentos, &desistiu);
+
+            if (desistiu == 1) {
+                    break; 
+            }
+            
+            venceu = verificar_Vitoria(tabuleiro_jogo);
         }
 
-    if(modo == 1)
-    {
-        printf("Modo Facil selecionado!\n");
-    }
-    else if(modo == 2)
-    {
-        printf("Modo Normal selecionado!\n");
-    }
+        system("cls");
+            imprimir_Tabuleiro(tabuleiro_jogo, opcao_menu);
 
-    tabuleiro_jogo = criar_Tabuleiro(modo);
+            if(venceu == 1){
+                printf("----- PARABENS! VOCE RESOLVEU O TABULEIRO EM %d MOVIMENTOS! -----", placar_movimentos);
+            } else {
+                printf("\n----- VOCE DESISTIU DA PARTIDA :( -----\n");
+            }
+            printf("\nPressione [ENTER] para voltar ao Menu Principal...");
+            getchar(); //limpa o buffer
+            getchar(); //espera o enter pra voltar
 
-    while(venceu == 0)
-    {
-        system("cls"); //comando pra limpar o terminal
-        imprimir_Tabuleiro(tabuleiro_jogo, modo);
-        verificar_Movimento(tabuleiro_jogo, modo);
-        venceu = verificar_Vitoria(tabuleiro_jogo);
+
+            //free na matriz
+            if (opcao_menu == 1) {
+                total_linhas = 5;
+            } else {
+                total_linhas = 4;
+            }
+            
+            for(i = 0; i < total_linhas; i++) {
+                free(tabuleiro_jogo[i]);
+            }
+            free(tabuleiro_jogo);
+        }
     }
-
-    system("cls");
-    imprimir_Tabuleiro(tabuleiro_jogo, modo);
-    printf("\n ---- PARABENS! VOCE RESOLVEU O TABULEIRO! ---- \n");
 }
